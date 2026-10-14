@@ -3,9 +3,9 @@
    ========================================================================== */
 
 :root {
-  --display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
-  --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --display: Arial, Helvetica, sans-serif;
+  --sans: Arial, Helvetica, sans-serif;
+  --mono: "Courier New", Courier, monospace;
 
   --radius-panel: 14px;
   --radius-field: 8px;
@@ -202,7 +202,7 @@ body {
   gap: 0.14em;
   flex-wrap: wrap;
   margin: 0;
-  font-family: var(--display);
+  font-family: var(--sans);
   font-weight: 800;
   font-size: clamp(1.75rem, 3.2vw, 2.55rem);
   line-height: 1.05;
@@ -322,7 +322,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--display);
+  font-family: var(--sans);
   font-weight: 700;
   font-size: 0.94rem;
 }
@@ -1028,6 +1028,7 @@ select {
   text-align: center;
 }
 .footer p { margin: 0; }
+.footer .linkedin-btn { margin-top: 14px; }
 
 .toast {
   position: fixed;
