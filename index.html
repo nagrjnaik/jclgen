@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JCL Generator Studio — IBM z/OS Job Control Language Builder</title>
+  <meta name="description" content="Build, validate, and download IBM z/OS JCL in your browser. Multi-step jobs, 10 utilities, DD statements, COND and IF/THEN/ELSE, with strict column-71 validation." />
+  <meta name="theme-color" content="#080c18" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080c18'/%3E%3Ctext x='32' y='43' font-family='monospace' font-size='30' font-weight='800' text-anchor='middle' fill='%236b95ff'%3E//%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("jcl-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#jclEditor">Skip to JCL output</a>
+
+  <!-- ================= TOP BAR ================= -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-cluster">
+        <a class="wordmark" href="#" aria-label="JCL Generator Studio">
+          <span class="wordmark-badge" aria-hidden="true">//</span>
+          <span class="wordmark-text">JCL<span class="wordmark-accent">STUDIO</span></span>
+        </a>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-tag">IBM z/OS • Col-71 Engine</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="resetAllBtn">
+          <span>Reset</span><span class="btn-label-long">&nbsp;to defaults</span>
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" id="themeToggle" aria-label="Switch theme">
+          <svg class="icon" id="themeIconSvg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"></svg>
+          <span id="themeToggleLabel">Light mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO & 3 JOB STARTERS ================= -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1 class="hero-title">
+          <span class="hero-slashes" aria-hidden="true">//</span>
+          <span>JCL Generator Studio</span>
+        </h1>
+        <p class="hero-sub">
+          Build job cards, configure utilities and DD statements, and generate validated 80-column z/OS JCL.
+        </p>
+      </div>
+
+      <div class="hero-presets">
+        <span class="preset-label">Job Starters</span>
+        <div class="preset-pills">
+          <button type="button" class="preset-pill" data-preset="SINGLE_DEFAULT">Single Step (IEFBR14)</button>
+          <button type="button" class="preset-pill" data-preset="ALLOC_SORT_COPY">3-Step: Alloc → Sort → Copy</button>
+          <button type="button" class="preset-pill" data-preset="VSAM_PIPELINE">2-Step: VSAM Define → REPRO</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MAIN WORKSPACE ================= -->
+  <main class="workspace">
+    <!-- ================= BUILDER ================= -->
+    <div class="builder">
+
+      <!-- PANEL 1: JOB CARD -->
+      <details class="panel" open>
+        <summary>
+          <span class="step-no">1</span>
+          <span class="panel-title">Job Card</span>
+          <span class="panel-tag">JOB Statement</span>
+        </summary>
+        <div class="panel-body">
+          <div class="grid g3">
+            <div class="field">
+              <label for="jobName">Job name</label>
+              <input class="mono" type="text" id="jobName" maxlength="8" value="JCLGEN01" placeholder="JCLGEN01" autocomplete="off" spellcheck="false" />
+              <small class="hint">1–8 chars, A–Z 0–9 @ # $</small>
+            </div>
+            <div class="field">
+              <label for="fileName">Output file name</label>
+              <input class="mono" type="text" id="fileName" value="jclgen01.jcl" placeholder="myjob.jcl" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="jobDesc">Header comment</label>
+              <input type="text" id="jobDesc" maxlength="50" value="BATCH UTILITY JOB GENERATED VIA WEB UI" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="subhead-row">
+            <h3 class="subhead">Job Card Parameters</h3>
+            <span class="hint">Toggle on to include in the JOB statement</span>
+          </div>
+          <div class="toggle-grid" id="jobToggles"></div>
+        </div>
+      </details>
+
+      <!-- COMPACT STEP SWITCHER BAR -->
+      <div class="step-switcher-bar" role="region" aria-label="Active job step selector">
+        <div class="step-switcher-top">
+          <div class="step-switcher-title">
+            <span class="live-pulse"></span>
+            <span>Active Step</span>
+            <span class="step-counter-pill" id="pipelineCountBadge">1 Step</span>
+          </div>
+          <button type="button" class="btn btn-xs btn-primary" id="addStepTopBtn">+ Add Step</button>
+        </div>
+        <div class="step-tabs-track" id="stepTabsTrack" role="tablist" aria-label="Job steps"></div>
+      </div>
+
+      <!-- PANEL 2: UTILITY -->
+      <details class="panel" open>
+        <summary>
+          <span class="step-no">2</span>
+          <span class="panel-title">Utility</span>
+          <span class="panel-tag" id="activeUtilityBadge">IEFBR14</span>
+        </summary>
+        <div class="panel-body">
+          <div class="utility-grid" id="utilityGrid" role="radiogroup" aria-label="Mainframe utility"></div>
+          <div class="utility-desc" id="utilityDesc" aria-live="polite"></div>
+        </div>
+      </details>
+
+      <!-- PANEL 3: STEP & CONDITIONS -->
+      <details class="panel" open>
+        <summary>
+          <span class="step-no">3</span>
+          <span class="panel-title">Step &amp; Conditions</span>
+          <span class="panel-tag">EXEC, COND, IF/ELSE</span>
+        </summary>
+        <div class="panel-body">
+          <div class="grid g4">
+            <div class="field">
+              <label for="stepName">Step name</label>
+              <input class="mono" type="text" id="stepName" maxlength="8" value="STEP010" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="sysprintDd">SYSPRINT label</label>
+              <input class="mono" type="text" id="sysprintDd" maxlength="8" value="SYSPRINT" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="sysinDd">SYSIN label</label>
+              <input class="mono" type="text" id="sysinDd" maxlength="8" value="SYSIN" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="sysoutClass">SYSOUT class</label>
+              <select class="mono" id="sysoutClass">
+                <option value="*" selected>* (MSGCLASS)</option>
+                <option value="A">A</option>
+                <option value="X">X</option>
+                <option value="H">H</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid g3 hidden" id="programRow">
+            <div class="field" id="programNameField">
+              <label for="programName">Program (PGM=)</label>
+              <input class="mono" type="text" id="programName" maxlength="8" value="MYCOBOL" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field" id="parmField">
+              <label for="parmVal">EXEC PARM string</label>
+              <input class="mono" type="text" id="parmVal" value="" placeholder="RPT=DAILY,MODE=1" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="steplibDsn">STEPLIB dataset</label>
+              <input class="mono" type="text" id="steplibDsn" value="PROD.APPL.LOADLIB" placeholder="PROD.APPL.LOADLIB" autocomplete="off" spellcheck="false" />
+              <small class="hint">Leave empty to omit STEPLIB</small>
+            </div>
+          </div>
+
+          <div class="grid g3 hidden" id="iebupdteRow">
+            <div class="field">
+              <label for="updteParm">IEBUPDTE PARM mode</label>
+              <select class="mono" id="updteParm">
+                <option value="NEW" selected>NEW — create new PDS members</option>
+                <option value="MOD">MOD — update or add members</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cond-stack">
+            <div class="cond-box">
+              <label class="switch">
+                <input type="checkbox" id="useCond" />
+                <span class="track"></span>
+                <span class="switch-text">Add <code>COND=</code> to EXEC</span>
+              </label>
+              <div class="cond-body hidden" id="condBody">
+                <div class="grid g4">
+                  <div class="field">
+                    <label for="condType">Mode</label>
+                    <select class="mono" id="condType">
+                      <option value="CODE" selected>(RC, operator)</option>
+                      <option value="EVEN">EVEN</option>
+                      <option value="ONLY">ONLY</option>
+                    </select>
+                  </div>
+                  <div class="field" data-cond-code>
+                    <label for="condRc">Return code</label>
+                    <input class="mono" type="number" id="condRc" min="0" max="4095" value="4" />
+                  </div>
+                  <div class="field" data-cond-code>
+                    <label for="condOp">Operator</label>
+                    <select class="mono" id="condOp">
+                      <option value="LT" selected>LT — less than</option>
+                      <option value="LE">LE — less or equal</option>
+                      <option value="EQ">EQ — equal</option>
+                      <option value="NE">NE — not equal</option>
+                      <option value="GT">GT — greater than</option>
+                      <option value="GE">GE — greater or equal</option>
+                    </select>
+                  </div>
+                  <div class="field" data-cond-code>
+                    <label for="condStep">Reference step</label>
+                    <input class="mono" type="text" id="condStep" maxlength="8" placeholder="STEP005" autocomplete="off" spellcheck="false" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cond-box">
+              <label class="switch">
+                <input type="checkbox" id="useIfElse" />
+                <span class="track"></span>
+                <span class="switch-text">Wrap step in <code>IF / THEN / ELSE / ENDIF</code></span>
+              </label>
+              <div class="cond-body hidden" id="ifElseBody">
+                <div class="grid g3">
+                  <div class="field">
+                    <label for="ifLabel">IF label</label>
+                    <input class="mono" type="text" id="ifLabel" maxlength="8" value="IFCHK01" autocomplete="off" spellcheck="false" />
+                  </div>
+                  <div class="field">
+                    <label for="ifPreset">Quick condition</label>
+                    <select class="mono" id="ifPreset">
+                      <option value="RC = 0" selected>RC = 0 — previous step OK</option>
+                      <option value="RC &lt;= 4">RC &lt;= 4 — warning or OK</option>
+                      <option value="STEP010.RC = 0">STEP010.RC = 0 — specific step</option>
+                      <option value="ABEND">ABEND — step abended</option>
+                      <option value="¬ABEND">¬ABEND — did not abend</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="ifCondition">Expression</label>
+                    <input class="mono" type="text" id="ifCondition" value="RC = 0" autocomplete="off" spellcheck="false" />
+                  </div>
+                </div>
+                <div class="else-box">
+                  <label class="switch">
+                    <input type="checkbox" id="includeElse" />
+                    <span class="track"></span>
+                    <span class="switch-text">Include an <code>ELSE</code> step</span>
+                  </label>
+                  <div class="grid g4 hidden" id="elseFields">
+                    <div class="field">
+                      <label for="elseStepName">ELSE step name</label>
+                      <input class="mono" type="text" id="elseStepName" maxlength="8" value="ERRSTEP" autocomplete="off" spellcheck="false" />
+                    </div>
+                    <div class="field">
+                      <label for="elsePgm">ELSE program</label>
+                      <input class="mono" type="text" id="elsePgm" maxlength="8" value="IEFBR14" autocomplete="off" spellcheck="false" />
+                    </div>
+                    <div class="field">
+                      <label for="elseDdDsn">ELSE dataset</label>
+                      <input class="mono" type="text" id="elseDdDsn" value="PROD.ERR.FLAG.FILE" autocomplete="off" spellcheck="false" />
+                    </div>
+                    <div class="field">
+                      <label for="elseComment">ELSE comment</label>
+                      <input type="text" id="elseComment" value="FALLBACK STEP ON ERROR" autocomplete="off" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- PANEL 4: DATASETS (DD STATEMENTS) -->
+      <details class="panel" open>
+        <summary>
+          <span class="step-no">4</span>
+          <span class="panel-title">Datasets</span>
+          <span class="panel-tag" id="ddCountBadge">1 DD</span>
+          <button type="button" class="btn btn-sm btn-primary summary-action" id="addDdBtn">+ Add DD</button>
+        </summary>
+        <div class="panel-body">
+          <div class="dd-quick-bar">
+            <span class="dd-quick-label">Quick Add:</span>
+            <button type="button" class="btn btn-xs btn-ghost" data-quick-dd="INPUT">+ Input (SHR)</button>
+            <button type="button" class="btn btn-xs btn-ghost" data-quick-dd="OUTPUT">+ Output (NEW)</button>
+            <button type="button" class="btn btn-xs btn-ghost" data-quick-dd="PDS">+ PDS</button>
+            <button type="button" class="btn btn-xs btn-ghost" data-quick-dd="SYSOUT">+ SYSOUT</button>
+            <button type="button" class="btn btn-xs btn-ghost" data-quick-dd="DUMMY">+ DUMMY</button>
+          </div>
+          <div class="dd-list" id="ddList"></div>
+        </div>
+      </details>
+
+      <!-- PANEL 5: CONTROL STATEMENTS -->
+      <details class="panel" open>
+        <summary>
+          <span class="step-no">5</span>
+          <span class="panel-title">Control Statements</span>
+          <span class="panel-tag" id="sysinTag">SYSIN</span>
+        </summary>
+        <div class="panel-body">
+          <div class="field">
+            <label for="sysinSnippet">Insert a snippet</label>
+            <select class="mono" id="sysinSnippet">
+              <option value="">Choose a control card snippet…</option>
+              <option value="DUMMY">DUMMY — no control cards</option>
+              <option value="SORT_ASC">SORT — ascending key (1,10,CH,A)</option>
+              <option value="SORT_DEDUP">SORT — deduplicate (SUM FIELDS=NONE)</option>
+              <option value="SORT_INCLUDE">SORT — INCLUDE COND filter</option>
+              <option value="IDCAMS_DEL_DEF">IDCAMS — delete and define KSDS cluster</option>
+              <option value="IDCAMS_REPRO">IDCAMS — REPRO copy dataset</option>
+              <option value="IDCAMS_GDG">IDCAMS — define GDG base</option>
+              <option value="IEBCOPY_ALL">IEBCOPY — copy all PDS members</option>
+              <option value="IEBCOPY_SEL">IEBCOPY — copy selected members</option>
+              <option value="IKJEFT01_DB2">IKJEFT01 — run DB2 COBOL program</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="sysinCards">Control statements (Columns 1–71)</label>
+            <textarea id="sysinCards" class="mono" rows="5" spellcheck="false" placeholder="Enter control statements, or type DUMMY"></textarea>
+            <small class="hint">Type <code>DUMMY</code> when the utility needs <code>//SYSIN DD DUMMY</code>.</small>
+          </div>
+        </div>
+      </details>
+
+      <!-- PANEL 6: MULTI-STEP JOB -->
+      <details class="panel" open>
+        <summary>
+          <span class="step-no">6</span>
+          <span class="panel-title">Multi-Step Job</span>
+          <span class="panel-tag" id="queueSummaryTag">1 Step</span>
+        </summary>
+        <div class="panel-body">
+          <div class="queue-toolbar">
+            <span class="hint">Click any step below to edit it in-place.</span>
+            <div class="queue-actions">
+              <button type="button" class="btn btn-sm btn-primary" id="addStepBtn">+ Add Step</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="dupStepBtn">Duplicate</button>
+              <button type="button" class="btn btn-sm btn-ghost" id="clearQueueBtn">Keep Current Only</button>
+            </div>
+          </div>
+
+          <ol class="queue-list" id="queueList" aria-label="Steps in this job"></ol>
+        </div>
+      </details>
+    </div>
+
+    <!-- ================= PREVIEW ================= -->
+    <aside class="preview" id="previewTop" aria-label="Generated JCL">
+      <div class="preview-sticky">
+        <div class="preview-card">
+          <div class="preview-head">
+            <div>
+              <div class="preview-title-row">
+                <h2 class="preview-title">JCL Output</h2>
+                <span class="col-pill">Col 71 Limit</span>
+              </div>
+              <p class="preview-meta" id="previewMeta">—</p>
+            </div>
+            <div class="preview-actions">
+              <button type="button" class="btn btn-sm btn-ghost" id="copyBtn">Copy</button>
+              <button type="button" class="btn btn-sm btn-primary" id="downloadBtn">Download .jcl</button>
+            </div>
+          </div>
+
+          <div class="card-ruler" aria-hidden="true">
+            <div class="ruler-gutter">LINE</div>
+            <div class="ruler-track" id="rulerTrack"><span id="rulerText"></span></div>
+          </div>
+
+          <div class="editor" id="editorBox">
+            <div class="editor-gutter" id="editorGutter" aria-hidden="true">001</div>
+            <div class="editor-stage">
+              <pre class="editor-hl" id="editorHl" aria-hidden="true"><code id="editorCode"></code></pre>
+              <textarea id="jclEditor" class="editor-input" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Generated JCL (editable)"></textarea>
+            </div>
+          </div>
+
+          <div class="editor-bar">
+            <button type="button" class="status" id="statusBtn" aria-expanded="false" aria-controls="warnPanel">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText">Checking…</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-ghost" id="revertBtn">Revert edits</button>
+          </div>
+          <ul class="warn-panel hidden" id="warnPanel"></ul>
+        </div>
+        <p class="editor-note">
+          <strong>Caution:</strong> Ensure jobs are validated prior to execution..
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p>Original architecture by <strong>Nagraj Naik</strong> • Static GitHub Pages Edition • 100% browser-based .</p>.</p>
+  </footer>
+
+  <div class="mobile-bar" role="group" aria-label="Output actions">
+    <a class="btn btn-ghost" href="#previewTop">View</a>
+    <button type="button" class="btn btn-ghost" id="copyBtnM">Copy</button>
+    <button type="button" class="btn btn-primary" id="downloadBtnM">Download .jcl</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/engine.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
