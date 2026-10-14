@@ -3,34 +3,34 @@
    ========================================================================== */
 
 :root {
-  --display: Arial, Helvetica, sans-serif;
-  --sans: Arial, Helvetica, sans-serif;
-  --mono: "Courier New", Courier, monospace;
+  --display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
 
-  --radius-panel: 14px;
-  --radius-field: 8px;
-  --radius-btn: 8px;
+  --radius-panel: 10px;
+  --radius-field: 6px;
+  --radius-btn: 6px;
   --gutter-w: 44px;
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #080c18;
-  --bg-glow-a: rgba(77, 123, 255, 0.16);
-  --bg-glow-b: rgba(56, 219, 149, 0.06);
-  --grid-dot: rgba(148, 172, 255, 0.055);
-  --surface: #0f162d;
-  --surface-2: #151e3d;
-  --surface-3: #1c274f;
-  --field: #0a1022;
-  --line: #23305c;
-  --line-soft: #1a2447;
-  --text: #eef2ff;
-  --muted: #93a2c8;
-  --accent: #6b95ff;
-  --accent-strong: #4e7dff;
-  --accent-ink: #060e29;
-  --accent-soft: rgba(107, 149, 255, 0.14);
+  --bg: #11151b;
+  --bg-glow-a: rgba(100, 116, 139, 0.08);
+  --bg-glow-b: rgba(71, 85, 105, 0.04);
+  --grid-dot: rgba(148, 163, 184, 0.025);
+  --surface: #191f27;
+  --surface-2: #202832;
+  --surface-3: #293441;
+  --field: #151b22;
+  --line: #303b48;
+  --line-soft: #28323d;
+  --text: #e5e9ef;
+  --muted: #a0aab7;
+  --accent: #8ba7c7;
+  --accent-strong: #a2bad5;
+  --accent-ink: #111923;
+  --accent-soft: rgba(139, 167, 199, 0.12);
   --amber: #ffb547;
   --amber-soft: rgba(255, 181, 71, 0.11);
   --ok: #3ddc97;
@@ -51,22 +51,22 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #eef2f9;
-  --bg-glow-a: rgba(45, 91, 232, 0.1);
-  --bg-glow-b: rgba(15, 154, 99, 0.07);
-  --grid-dot: rgba(35, 55, 120, 0.075);
+  --bg: #f3f4f2;
+  --bg-glow-a: rgba(100, 116, 139, 0.035);
+  --bg-glow-b: rgba(148, 163, 184, 0.025);
+  --grid-dot: rgba(51, 65, 85, 0.018);
   --surface: #ffffff;
-  --surface-2: #f4f7fd;
-  --surface-3: #e9effb;
-  --field: #f8faff;
-  --line: #d4ddef;
-  --line-soft: #e3eaf7;
-  --text: #111936;
-  --muted: #566589;
-  --accent: #2956e0;
-  --accent-strong: #1c44c4;
+  --surface-2: #f7f8f7;
+  --surface-3: #ecefed;
+  --field: #ffffff;
+  --line: #dfe3e0;
+  --line-soft: #e9ece9;
+  --text: #252b31;
+  --muted: #69737d;
+  --accent: #536f8b;
+  --accent-strong: #405b76;
   --accent-ink: #ffffff;
-  --accent-soft: rgba(41, 86, 224, 0.1);
+  --accent-soft: rgba(83, 111, 139, 0.09);
   --amber: #c77700;
   --amber-soft: rgba(215, 130, 0, 0.09);
   --ok: #0d945f;
@@ -92,16 +92,13 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--sans);
-  font-size: 14.5px;
-  line-height: 1.5;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
   color: var(--text);
   background-color: var(--bg);
-  background-image:
-    radial-gradient(900px 460px at 8% -6%, var(--bg-glow-a), transparent 70%),
-    radial-gradient(720px 420px at 98% 8%, var(--bg-glow-b), transparent 70%),
-    radial-gradient(var(--grid-dot) 1px, transparent 1.2px);
-  background-size: auto, auto, 22px 22px;
-  background-attachment: fixed, fixed, scroll;
+  background-image: linear-gradient(180deg, var(--bg-glow-a), transparent 360px);
+  background-attachment: scroll;
 }
 
 .hidden { display: none !important; }
@@ -111,7 +108,7 @@ body {
 .skip-link {
   position: absolute; left: 12px; top: -48px; z-index: 100;
   padding: 8px 14px; border-radius: 8px;
-  background: var(--accent); color: var(--accent-ink); font-weight: 600;
+  background: var(--accent); color: var(--accent-ink); font-weight: 500;
 }
 .skip-link:focus { top: 12px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -153,7 +150,7 @@ body {
   align-items: center;
   gap: 8px;
   font-family: var(--mono);
-  font-weight: 800;
+  font-weight: 600;
   font-size: 14.5px;
   letter-spacing: 0.02em;
   color: var(--text);
@@ -279,7 +276,7 @@ body {
 .btn:active { transform: translateY(1px); }
 .btn-sm { padding: 6px 10px; font-size: 12px; }
 .btn-xs { padding: 4px 8px; font-size: 11.5px; border-radius: 6px; }
-.btn-primary { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .btn-primary:hover { background: var(--accent-strong); }
 .btn-ghost { border-color: var(--line); background: var(--surface); }
 .btn-ghost:hover { border-color: var(--accent); background: var(--accent-soft); }
@@ -398,7 +395,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 .panel > summary {
   display: flex;
@@ -601,7 +598,7 @@ select {
   background: var(--accent-soft);
   box-shadow: inset 3px 0 0 var(--accent);
 }
-.u-name { font: 700 13px var(--mono); }
+.u-name { font: 500 12.5px var(--mono); }
 .u-title { font-size: 11.5px; color: var(--muted); line-height: 1.25; }
 .utility-desc {
   margin: 0;
@@ -664,7 +661,7 @@ select {
   gap: 10px;
   flex-wrap: wrap;
 }
-.dd-title { margin: 0; font: 700 13.5px var(--mono); }
+.dd-title { margin: 0; font: 500 13px var(--mono); }
 .dd-slashes { color: var(--accent); }
 .dd-toggles { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
 .dd-sub {
@@ -774,7 +771,7 @@ select {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow);
+  box-shadow: none;
   overflow: hidden;
 }
 .preview-head {
@@ -1151,3 +1148,14 @@ select {
   .summary-action { margin-left: auto; }
   .btn-label-long, #themeToggleLabel { display: none; }
 }
+
+/* Quiet, readable type and restrained surfaces */
+.hero-title, .panel-title, .subhead, .preview-title, .step-switcher-title { letter-spacing: -0.02em; }
+.hero-title { font-weight: 600; }
+.panel-title, .preview-title, .subhead { font-weight: 600; }
+.panel, .preview-card, .step-switcher-bar { box-shadow: none; }
+.panel { border-radius: 9px; }
+.panel > summary { gap: 10px; }
+.step-no { font-family: var(--sans); font-weight: 500; }
+.btn { font-weight: 500; }
+.btn-primary { font-weight: 600; }
